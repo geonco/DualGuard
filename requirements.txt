@@ -1,0 +1,36 @@
+# DualGuard — 명세서 6번 소프트웨어 스택 기반
+# Python 3.9 이상
+
+# ---- 영상 처리 / 얼굴 검출 ----
+opencv-python>=4.8.0
+mediapipe>=0.10.0
+numpy>=1.23.0
+Pillow>=9.0.0
+
+# ---- 얼굴 인식 (FaceNet) ----
+facenet-pytorch>=2.5.3
+
+# ---- 딥러닝 프레임워크 ----
+torch>=2.0.0
+torchvision>=0.15.0
+
+# ---- Anti-Spoofing (MiniFASNet) 의존 ----
+# Silent-Face-Anti-Spoofing 저장소를 별도로 clone 후 weights 사용
+
+# ---- 양자화 비교용 ----
+tensorflow>=2.13.0    # TFLite Post-Training Quantization
+
+# ---- IoT / MQTT ----
+paho-mqtt>=1.6.1
+
+# ---- GPIO / LCD (Raspberry Pi) ----
+RPi.GPIO; platform_machine == "armv7l" or platform_machine == "aarch64"
+gpiozero; platform_machine == "armv7l" or platform_machine == "aarch64"
+smbus2; platform_machine == "armv7l" or platform_machine == "aarch64"
+RPLCD; platform_machine == "armv7l" or platform_machine == "aarch64"
+
+# ---- 터미널 출력 ----
+colorama>=0.4.6
+
+# ---- 테스트 ----
+pytest>=7.4.0
