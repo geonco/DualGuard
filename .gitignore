@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.pytest_cache/
+
+# venv
+.venv/
+venv/
+env/
+
+# pyenv
+.python-version
+
+# 데이터/모델 — 용량 크고 환경별 다름
+data/users.json
+data/embeddings.npy
+data/access_log.csv
+data/attack_samples/
+models/*.pt
+models/*.pth
+models/*.tflite
+
+# 데모/테스트 산출물
+*.jpg
+*.png
+*.mp4
+!docs/**/*.png
+!docs/**/*.jpg
+
+# IDE
+.vscode/
+.idea/
+*.swp
+.DS_Store
