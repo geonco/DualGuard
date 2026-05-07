@@ -4,6 +4,7 @@
 런타임 동작에 필요한 상수를 한 곳에 모아둔다.
 """
 
+import os
 from pathlib import Path
 
 # ---------------------------------------------------------------------------
@@ -19,7 +20,13 @@ ACCESS_LOG_CSV = DATA_DIR / "access_log.csv"
 ATTACK_SAMPLES_DIR = DATA_DIR / "attack_samples"
 
 FACENET_WEIGHTS = MODELS_DIR / "facenet.pt"
-MINIFASNET_WEIGHTS = MODELS_DIR / "mini_fasnet.pth"
+
+# Silent-Face-Anti-Spoofing 저장소 위치 (MiniFASNet 모델 정의 + V1SE/V2 가중치 사용).
+# 기본값: ~/Silent-Face-Anti-Spoofing. 환경변수 SILENT_FACE_ROOT 로 오버라이드 가능.
+SILENT_FACE_ROOT = Path(
+    os.environ.get("SILENT_FACE_ROOT", str(Path.home() / "Silent-Face-Anti-Spoofing"))
+)
+MINIFASNET_WEIGHTS_DIR = SILENT_FACE_ROOT / "resources" / "anti_spoof_models"
 
 # ---------------------------------------------------------------------------
 # 카메라
