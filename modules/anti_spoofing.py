@@ -12,7 +12,10 @@ Silent-Face-Anti-Spoofing 저장소(외부 의존성)의 MiniFASNetV1SE / MiniFA
 
 from __future__ import annotations
 
+import contextlib
+import os
 import sys
+from pathlib import Path
 from typing import Tuple
 
 import numpy as np
@@ -26,6 +29,19 @@ def _ensure_silent_face_on_path() -> None:
     root = str(config.SILENT_FACE_ROOT)
     if root not in sys.path:
         sys.path.insert(0, root)
+
+
+@contextlib.contextmanager
+def _chdir(path: Path):
+    """일시적으로 CWD 변경 — Silent-Face가 상대경로로 자체 검출기 가중치를 로드하는
+    문제 우회용.
+    """
+    prev = os.getcwd()
+    os.chdir(path)
+    try:
+        yield
+    finally:
+        os.chdir(prev)
 
 
 class AntiSpoofing:
@@ -49,7 +65,10 @@ class AntiSpoofing:
 
         self._parse_model_name = parse_model_name
         self._cropper = CropImage()
-        self._predictor = AntiSpoofPredict(device_id)
+        # AntiSpoofPredict 부모(Detection)가 상대경로로 Caffe 모델을 로드하므로
+        # 그 디렉토리에서 init만 실행시킨 후 복귀.
+        with _chdir(config.SILENT_FACE_ROOT):
+            self._predictor = AntiSpoofPredict(device_id)
 
         if not config.MINIFASNET_WEIGHTS_DIR.exists():
             raise FileNotFoundError(
