@@ -22,6 +22,7 @@ from modules.face_detector import FaceDetector
 from modules.face_recognizer import FaceRecognizer
 
 CAPTURE_INTERVAL_SEC = 0.6  # 다양한 각도/표정 유도용
+SAMPLES_DIR = config.DATA_DIR / "registered_samples"
 
 
 def _draw_overlay(frame, text: str, count: int, total: int) -> None:
@@ -59,6 +60,9 @@ def register_user(name: str) -> None:
     embeddings: list = []
     target = config.REGISTER_NUM_SAMPLES
     last_capture = 0.0
+
+    sample_dir = SAMPLES_DIR / name
+    sample_dir.mkdir(parents=True, exist_ok=True)
     print(f"[register] Starting registration for '{name}'.")
     print(f"[register] Look at the camera and slowly vary your angle/expression.")
     print(f"[register] Capturing {target} samples. Press ESC to cancel.")
@@ -83,8 +87,10 @@ def register_user(name: str) -> None:
                     try:
                         emb = recognizer.embed(face)
                         embeddings.append(emb)
+                        sample_path = sample_dir / f"{len(embeddings):02d}.jpg"
+                        cv2.imwrite(str(sample_path), face)
                         last_capture = now
-                        print(f"[register] captured {len(embeddings)}/{target}")
+                        print(f"[register] captured {len(embeddings)}/{target} -> {sample_path}")
                     except Exception as e:
                         print(f"[register] capture failed: {e}")
 

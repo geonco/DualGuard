@@ -18,6 +18,7 @@ data/users.json
 data/embeddings.npy
 data/access_log.csv
 data/attack_samples/
+data/registered_samples/
 models/*.pt
 models/*.pth
 models/*.tflite
