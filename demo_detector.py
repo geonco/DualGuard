@@ -20,7 +20,7 @@ def main() -> None:
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, config.FRAME_HEIGHT)
 
     if not cap.isOpened():
-        raise RuntimeError(f"카메라 열기 실패: index={config.CAMERA_INDEX}")
+        raise RuntimeError(f"Failed to open camera: index={config.CAMERA_INDEX}")
 
     last = time.time()
     fps = 0.0
@@ -30,7 +30,7 @@ def main() -> None:
             while True:
                 ok, frame = cap.read()
                 if not ok:
-                    print("프레임 캡처 실패")
+                    print("Frame capture failed")
                     break
 
                 boxes = detector.detect(frame)
