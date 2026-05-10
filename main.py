@@ -33,6 +33,7 @@ from modules.fusion import (
     decide_and,
     decide_weighted,
 )
+from modules.mqtt_publisher import MQTTPublisher
 
 # 미등록 자/사진 공격이 카메라 앞에 잠깐 잡혀도 매 프레임 anti-spoof + 인식을
 # 풀로 돌리면 FPS 폭락하므로, 얼굴이 보일 때 N프레임에 한 번만 풀 추론한다.
@@ -124,6 +125,13 @@ def main() -> None:
     detector = FaceDetector(min_confidence=0.5)
     recognizer = FaceRecognizer(data_manager=dm)
     spoof = AntiSpoofing()
+    mqtt_pub = MQTTPublisher(
+        host=config.MQTT_BROKER_HOST,
+        port=config.MQTT_BROKER_PORT,
+        client_id=config.MQTT_CLIENT_ID,
+        keepalive=config.MQTT_KEEPALIVE,
+    )
+    mqtt_pub.publish_status("started")
 
     cap = cv2.VideoCapture(config.CAMERA_INDEX)
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, config.FRAME_WIDTH)
@@ -171,6 +179,17 @@ def main() -> None:
                             facenet_score=result.facenet_score,
                             fasnet_score=result.fasnet_score,
                         )
+                        if result.passed:
+                            mqtt_pub.publish_granted(
+                                user=result.user or "?",
+                                confidence=result.facenet_score,
+                            )
+                        else:
+                            mqtt_pub.publish_denied(
+                                reason=result.reason,
+                                confidence=max(result.facenet_score, result.fasnet_score),
+                                user=result.user,
+                            )
                         if elapsed_ms > 0:
                             print(f"        (inference {elapsed_ms:.0f} ms)")
                     last_result = result
@@ -197,6 +216,7 @@ def main() -> None:
         cap.release()
         cv2.destroyAllWindows()
         detector.close()
+        mqtt_pub.close()
         print("[main] Bye.")
 
 
