@@ -30,6 +30,11 @@ models/*.tflite
 !docs/**/*.png
 !docs/**/*.jpg
 
+# 시크릿 (텔레그램 봇 토큰 등)
+.env
+.env.*
+!.env.example
+
 # IDE
 .vscode/
 .idea/
