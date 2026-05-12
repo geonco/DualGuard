@@ -33,6 +33,7 @@ from modules.fusion import (
     decide_and,
     decide_weighted,
 )
+from modules.gpio_controller import GPIOController
 from modules.mqtt_publisher import MQTTPublisher
 
 # 미등록 자/사진 공격이 카메라 앞에 잠깐 잡혀도 매 프레임 anti-spoof + 인식을
@@ -132,6 +133,7 @@ def main() -> None:
         keepalive=config.MQTT_KEEPALIVE,
     )
     mqtt_pub.publish_status("started")
+    gpio = GPIOController()
 
     cap = cv2.VideoCapture(config.CAMERA_INDEX)
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, config.FRAME_WIDTH)
@@ -184,12 +186,14 @@ def main() -> None:
                                 user=result.user or "?",
                                 confidence=result.facenet_score,
                             )
+                            gpio.grant_access(result.user or "user")
                         else:
                             mqtt_pub.publish_denied(
                                 reason=result.reason,
                                 confidence=max(result.facenet_score, result.fasnet_score),
                                 user=result.user,
                             )
+                            gpio.deny_access(result.reason)
                         if elapsed_ms > 0:
                             print(f"        (inference {elapsed_ms:.0f} ms)")
                     last_result = result
@@ -217,6 +221,7 @@ def main() -> None:
         cv2.destroyAllWindows()
         detector.close()
         mqtt_pub.close()
+        gpio.cleanup()
         print("[main] Bye.")
 
 
